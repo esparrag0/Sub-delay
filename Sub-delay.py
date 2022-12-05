@@ -5,23 +5,23 @@ from pathlib import Path
 
 subs_path = Path.cwd()
 output_path = Path.cwd() / 'Search-matches.txt'
-searched_term = sys.argv[1]
 subs_files = os.listdir(subs_path)
-episode_regex = re.compile(r'\d\d')
-season_regex = re.compile(r'S\d\d')
+sub_delay = 1000
+
+MILISECONDS_PER_HOUR = 3600000
+MILISECONDS_PER_MINUTE = 60000
+MILISECONDS_PER_SECOND = 1000
+
+
+
+seconds = sub_delay // 1000
+minutes = seconds 
 
 for sub_file in subs_files:
 
     sub_file_location = Path(subs_path) / Path(str(sub_file))
     text = open(sub_file_location, encoding = "UTF-8").readlines()
-    output_file = open(output_path, 'a', encoding = "UTF-8")
-    episode = episode_regex.findall(sub_file)
-    if episode == None:
-        continue
-    if season_regex.search(sub_file) == None:
-        num = 0
-    else:
-        num = 1
+    #output_file = open(output_path, 'a', encoding = "UTF-8")
 
     if sub_file.endswith('srt'):
         
@@ -40,20 +40,21 @@ for sub_file in subs_files:
 
         time_regex = re.compile(r'\d,\d:\d\d:\d\d.\d\d')
 
-        for line in text:
+        with open(sub_file_location) as sub_file_location:
+            for num, line in enumerate(sub_file_location, 0):
+                if time_regex.search(line) != None:
+                    dialogue_regex = re.compile(r'}(.*)')
+                    dialogue = dialogue_regex.search(line).group(1)
 
-            if searched_term in line and 'Dialogue' in line:
-                dialogue_regex = re.compile(r'}(.*)')
-                dialogue = dialogue_regex.search(line)
-                
-                sub_time = time_regex.search(line)
+                    #Search for a typesetting dialogue and gets its text
 
-                if dialogue != None:  
-                    output_file.write('Episode: ' + episode[num] + '\n' + 'Start time: ' + sub_time.group() + '\n' + 'Dialogue: ' + dialogue.group(1) + 2 * '\n')
-
+                    sub_time = time_regex.search(line).group()
+                    
+                    #Separate the total of miliseconds in miliseconds, seconds, minutes, etc.
                 else:
                     dialogue_regex = re.compile(r'\d,\d,\d,,(.*)')
                     dialogue = dialogue_regex.search(line)
                     output_file.write('Episode: ' + episode[num] + '\n' + 'Start time: ' + sub_time.group() + '\n' + 'Dialogue: ' + dialogue.group(1) + 2 * '\n')
+#Use split(,,) to get the dialogue text and add it to the new line Dialogue:  (delayed timing)
 
-output_file.close()
+#output_file.close()
