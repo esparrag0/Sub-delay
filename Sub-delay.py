@@ -33,7 +33,7 @@ for sub_file in subs_files:
 
     if sub_file.endswith('ass'):
 
-        time_regex = re.compile(r'\d,(\d):(\d\d):(\d\d).(\d\d)')
+        time_regex = re.compile(r'\d,(\d):(\d\d):(\d\d)\.(\d\d)')
 
         with open(sub_file_location) as sub_file_location:
             for num, line in enumerate(text, 0):
@@ -41,10 +41,14 @@ for sub_file in subs_files:
                 time = time_regex.search(line)
 
                 if time != None:
-                    dialogue_regex = re.compile(r'(.*)(\d,\d:\d\d:\d\d.\d\d)(.*)') #Just considers the ending time
-                    
-                    #Will divide the dialogue into (previous text, time, posterior text)
+                    dialogue_regex = re.compile(r'(.*)(\d,\d:\d\d:\d\d.\d\d),(\d,\d:\d\d:\d\d.\d\d)(.*)') 
+                                                                                   #Just considers the ending time
+                                                                                   #maybe use findall method in line_con
+                                                                                   #prolly gonna expand the regex to include
+                                                                                   #both times together
 
+                    #Will divide the dialogue into (previous text, start time, end time, posterior text)
+                    print(time.group())
                     line_content = dialogue_regex.search(line)
 
                     hours = int(time.group(1))
@@ -89,7 +93,7 @@ for sub_file in subs_files:
 
                     timestamp = '0,' + str(hours) + ':' + minutes + ':' + seconds + '.' + miliseconds
 
-                    output_file.write(line_content.group(1) + timestamp + line_content.group(3) + '\n')
+                    output_file.write(line_content.group(1) + timestamp + line_content.group(4) + '\n')
 
                 else:
                     output_file.write(text[num])
