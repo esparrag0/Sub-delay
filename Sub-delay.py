@@ -33,7 +33,7 @@ for sub_file in subs_files:
 
     if sub_file.endswith('ass'):
 
-        time_regex = re.compile(r'\d,(\d):(\d\d):(\d\d)\.(\d\d)')
+        time_regex = re.compile(r'\d,(\d):(\d\d):(\d\d\.\d\d)(,)(\d):(\d\d):(\d\d\.\d\d)')
 
         with open(sub_file_location) as sub_file_location:
             for num, line in enumerate(text, 0):
@@ -41,65 +41,52 @@ for sub_file in subs_files:
                 time = time_regex.search(line)
 
                 if time != None:
-                    dialogue_regex = re.compile(r'(.*)(\d,\d:\d\d:\d\d.\d\d),(\d,\d:\d\d:\d\d.\d\d)(.*)') 
-                                                                                   #Just considers the ending time
-                                                                                   #maybe use findall method in line_con
-                                                                                   #prolly gonna expand the regex to include
-                                                                                   #both times together
+                    dialogue_regex = re.compile(r'(.*)(\d:\d\d:\d\d\.\d\d),(\d:\d\d:\d\d\.\d\d)(.*)') 
 
                     #Will divide the dialogue into (previous text, start time, end time, posterior text)
-                    print(time.group())
+                    
                     line_content = dialogue_regex.search(line)
 
-                    hours = int(time.group(1))
-                    minutes = int(time.group(2))
-                    seconds = int(time.group(3))
-                    miliseconds = int(time.group(4))*10
+                    timestamps = []
 
-                    #Separate in groups the different time units
+                    for i in [1, 5]:
 
-                    miliseconds_total = miliseconds + hours * MILISECONDS_PER_HOUR + minutes * MILISECONDS_PER_MINUTE + seconds * MILISECONDS_PER_SECOND + sub_delay
-                    
-                    hours = miliseconds_total // MILISECONDS_PER_HOUR
-                    miliseconds = miliseconds_total % MILISECONDS_PER_HOUR
+                        hours = int(time.group(i))
+                        minutes = int(time.group(i+1))
+                        seconds = float(time.group(i+2))
 
-                    minutes = miliseconds // MILISECONDS_PER_MINUTE
-                    miliseconds = miliseconds % MILISECONDS_PER_MINUTE
+                        #Separate in groups the different time units
 
-                    seconds = miliseconds // MILISECONDS_PER_SECOND
-                    miliseconds = miliseconds % MILISECONDS_PER_SECOND #prolly will have to divide by 10, round to two digits
-                                                                       # and treat it as a
-                                                                       #fraction of a second to dont worry about padding
-                                                                       #or exceding the amount of digits.
+                        miliseconds_total = int(hours * MILISECONDS_PER_HOUR + minutes * MILISECONDS_PER_MINUTE + seconds * MILISECONDS_PER_SECOND + sub_delay)
 
-                    #Turn everything into miliseconds, add it up with the sub_delay and convert back
-                    #to hours, minutes, seconds and miliseconds
-        
-                    #prolly wrong to include miliseconds here
-                    if len(str(minutes)) == 1:
-                        minutes = '0' + str(minutes)
-                    else:
-                        minutes = str(minutes)
-   
-                    if len(str(seconds)) == 1:
-                        seconds = '0' + str(seconds)
-                    else:
-                        seconds = str(seconds)
+                        hours = miliseconds_total // MILISECONDS_PER_HOUR
+                        miliseconds = miliseconds_total % MILISECONDS_PER_HOUR
 
-                    if len(str(miliseconds)) == 1:
-                        miliseconds = '0' + str(miliseconds)
-                    else:
-                        miliseconds = str(miliseconds)
+                        minutes = miliseconds // MILISECONDS_PER_MINUTE
+                        miliseconds = miliseconds % MILISECONDS_PER_MINUTE
 
-                    timestamp = '0,' + str(hours) + ':' + minutes + ':' + seconds + '.' + miliseconds
+                        seconds = round(miliseconds / MILISECONDS_PER_SECOND,2)
 
-                    output_file.write(line_content.group(1) + timestamp + line_content.group(4) + '\n')
+                        #Turn everything into miliseconds, add it up with the sub_delay and convert back
+                        #to hours, minutes and seconds 
+
+                        if len(str(minutes)) == 1:
+                            minutes = '0' + str(minutes)
+                        else:
+                            minutes = str(minutes)
+    
+                        if len(str(seconds)) == 1:
+                            seconds = '0' + str(seconds)
+                        else:
+                            seconds = str(seconds)
+
+
+                        timestamp = str(hours) + ':' + minutes + ':' + seconds
+
+                        timestamps.append(timestamp)
+
+                    output_file.write(line_content.group(1) + timestamps[0] + ',' + timestamps[1] + line_content.group(4) + '\n')
 
                 else:
                     output_file.write(text[num])
 
-
-
-#Use split(,,) to get the dialogue text and add it to the new line Dialogue:  (delayed timing)
-
-#output_file.close()
