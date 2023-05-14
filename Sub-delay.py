@@ -5,7 +5,7 @@ from pathlib import Path
 
 subs_path = Path.cwd()
 subs_files = os.walk(subs_path)
-sub_delay = 73400
+sub_delay = sys.argv[1]
 
 MILISECONDS_PER_HOUR = 3600000
 MILISECONDS_PER_MINUTE = 60000
@@ -16,7 +16,7 @@ for dirpath, dirnames, filenames in subs_files:
 
         if filename.endswith('ass'):
                 sub_file_location = Path(dirpath) / Path(str(filename))
-                print(sub_file_location)
+                #print(sub_file_location, filename, filenames)
                 text = open(sub_file_location, encoding = "UTF-8").readlines()
                 output_file = open(sub_file_location, 'w', encoding = "UTF-8")
         else:
