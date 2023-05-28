@@ -22,7 +22,7 @@ for dirpath, dirnames, filenames in subs_files:
         else:
             continue
         
-        print(sub_file_location)
+
     # if sub_file.endswith('srt'):
             
     #     time_regex = re.compile(r'\d\d:\d\d:\d\d,\d\d\d')
