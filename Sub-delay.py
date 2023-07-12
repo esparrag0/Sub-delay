@@ -16,7 +16,6 @@ for dirpath, dirnames, filenames in subs_files:
 
         if filename.endswith('ass'):
                 sub_file_location = Path(dirpath) / Path(str(filename))
-                #print(sub_file_location, filename, filenames)
                 text = open(sub_file_location, encoding = "UTF-8").readlines()
                 output_file = open(sub_file_location, 'w', encoding = "UTF-8")
         else:
@@ -59,10 +58,10 @@ for dirpath, dirnames, filenames in subs_files:
                             hours = int(time.group(i))
                             minutes = int(time.group(i+1))
                             seconds = float(time.group(i+2))
-    
+
                             #Separate in groups the different time units
     
-                            miliseconds_total = int(hours * MILISECONDS_PER_HOUR + minutes * MILISECONDS_PER_MINUTE + seconds * MILISECONDS_PER_SECOND + sub_delay)
+                            miliseconds_total = int(hours * MILISECONDS_PER_HOUR + minutes * MILISECONDS_PER_MINUTE + seconds * MILISECONDS_PER_SECOND + int(sub_delay))
     
                             hours = miliseconds_total // MILISECONDS_PER_HOUR
                             miliseconds = miliseconds_total % MILISECONDS_PER_HOUR
